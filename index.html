@@ -1,0 +1,699 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Reactor · Guiones a audio</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@400;600;700&family=IBM+Plex+Sans:wght@400;500&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+/* ============================================================ tokens */
+:root{
+  --vacio:#04070e;
+  --panel:#0a1220;
+  --linea:#16263c;
+  --arco:#4de1ff;
+  --arco-hondo:#0a84ff;
+  --oro:#ffb020;
+  --texto:#c8d8e8;
+  --tenue:#5a7089;
+
+  --display:'Chakra Petch',system-ui,sans-serif;
+  --cuerpo:'IBM Plex Sans',system-ui,sans-serif;
+  --mono:'JetBrains Mono',ui-monospace,monospace;
+
+  --radio:3px;
+}
+
+*{box-sizing:border-box}
+
+html,body{margin:0;padding:0}
+
+body{
+  background:var(--vacio);
+  background-image:
+    radial-gradient(ellipse 90% 60% at 50% -10%, rgba(10,132,255,.16), transparent 70%),
+    linear-gradient(rgba(77,225,255,.028) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(77,225,255,.028) 1px, transparent 1px);
+  background-size:auto, 46px 46px, 46px 46px;
+  color:var(--texto);
+  font-family:var(--cuerpo);
+  font-size:15px;
+  line-height:1.6;
+  min-height:100vh;
+}
+
+:focus-visible{
+  outline:2px solid var(--arco);
+  outline-offset:2px;
+}
+
+/* ============================================================ estructura */
+.marco{
+  max-width:1180px;
+  margin:0 auto;
+  padding:28px 22px 72px;
+}
+
+header{
+  display:flex;
+  align-items:baseline;
+  justify-content:space-between;
+  gap:18px;
+  flex-wrap:wrap;
+  padding-bottom:16px;
+  border-bottom:1px solid var(--linea);
+}
+
+.marca{
+  font-family:var(--display);
+  font-weight:700;
+  font-size:clamp(22px,3.4vw,30px);
+  letter-spacing:.16em;
+  text-transform:uppercase;
+  color:#eaf6ff;
+  margin:0;
+}
+.marca b{color:var(--arco);font-weight:700}
+
+.lema{
+  font-family:var(--mono);
+  font-size:11px;
+  letter-spacing:.13em;
+  text-transform:uppercase;
+  color:var(--tenue);
+}
+
+.tablero{
+  display:grid;
+  grid-template-columns:minmax(0,1.55fr) minmax(320px,1fr);
+  gap:22px;
+  margin-top:26px;
+  align-items:start;
+}
+@media (max-width:900px){
+  .tablero{grid-template-columns:1fr}
+}
+
+.modulo{
+  background:linear-gradient(180deg, rgba(10,18,32,.92), rgba(6,11,20,.92));
+  border:1px solid var(--linea);
+  border-radius:var(--radio);
+  padding:18px;
+  position:relative;
+}
+.modulo::before{
+  content:'';
+  position:absolute;
+  inset:-1px auto auto -1px;
+  width:16px;height:16px;
+  border-top:1px solid var(--arco);
+  border-left:1px solid var(--arco);
+  opacity:.55;
+}
+
+.rotulo{
+  font-family:var(--mono);
+  font-size:10px;
+  letter-spacing:.18em;
+  text-transform:uppercase;
+  color:var(--tenue);
+  margin:0 0 12px;
+  display:flex;
+  justify-content:space-between;
+  gap:12px;
+}
+.rotulo em{font-style:normal;color:var(--arco)}
+
+/* ============================================================ guion */
+textarea{
+  width:100%;
+  min-height:340px;
+  resize:vertical;
+  background:#03060c;
+  border:1px solid var(--linea);
+  border-radius:var(--radio);
+  color:var(--texto);
+  font-family:var(--cuerpo);
+  font-size:15px;
+  line-height:1.75;
+  padding:16px;
+}
+textarea::placeholder{color:#3d5169}
+textarea:focus{border-color:var(--arco-hondo)}
+
+.telemetria{
+  display:flex;
+  gap:22px;
+  flex-wrap:wrap;
+  margin-top:12px;
+  font-family:var(--mono);
+  font-size:11px;
+  letter-spacing:.08em;
+  color:var(--tenue);
+}
+.telemetria strong{
+  color:var(--arco);
+  font-weight:500;
+}
+
+/* ============================================================ voces */
+.voces{display:grid;gap:8px}
+
+.voz{
+  display:grid;
+  grid-template-columns:1fr auto;
+  align-items:center;
+  gap:12px;
+  padding:11px 13px;
+  background:#03060c;
+  border:1px solid var(--linea);
+  border-radius:var(--radio);
+  cursor:pointer;
+  transition:border-color .18s, background .18s;
+}
+.voz:hover{border-color:#22405f}
+.voz.activa{
+  border-color:var(--arco-hondo);
+  background:linear-gradient(90deg, rgba(10,132,255,.14), rgba(3,6,12,0));
+}
+
+.voz-pais{
+  font-family:var(--display);
+  font-weight:600;
+  font-size:14px;
+  letter-spacing:.1em;
+  text-transform:uppercase;
+  color:#eaf6ff;
+  display:block;
+}
+.voz.activa .voz-pais{color:var(--arco)}
+.voz-nombre{
+  font-family:var(--display);
+  font-weight:600;
+  font-size:13px;
+  letter-spacing:.05em;
+  color:var(--texto);
+  margin-right:7px;
+}
+.voz-id{
+  font-family:var(--mono);
+  font-size:10px;
+  color:var(--tenue);
+  letter-spacing:.04em;
+}
+
+.genero{display:flex;border:1px solid var(--linea);border-radius:var(--radio);overflow:hidden}
+.genero button{
+  background:transparent;
+  border:0;
+  color:var(--tenue);
+  font-family:var(--mono);
+  font-size:10px;
+  letter-spacing:.1em;
+  padding:5px 9px;
+  cursor:pointer;
+}
+.genero button[aria-pressed="true"]{
+  background:rgba(10,132,255,.22);
+  color:var(--arco);
+}
+
+/* ============================================================ controles */
+.campo{margin-top:16px}
+.campo > span{
+  display:block;
+  font-family:var(--mono);
+  font-size:10px;
+  letter-spacing:.16em;
+  text-transform:uppercase;
+  color:var(--tenue);
+  margin-bottom:7px;
+}
+
+.ritmo{display:flex;gap:6px}
+.ritmo button{
+  flex:1;
+  background:#03060c;
+  border:1px solid var(--linea);
+  border-radius:var(--radio);
+  color:var(--tenue);
+  font-family:var(--mono);
+  font-size:11px;
+  padding:8px 0;
+  cursor:pointer;
+  transition:border-color .18s,color .18s;
+}
+.ritmo button[aria-pressed="true"]{
+  border-color:var(--arco-hondo);
+  color:var(--arco);
+  background:rgba(10,132,255,.12);
+}
+
+input[type="text"]{
+  width:100%;
+  background:#03060c;
+  border:1px solid var(--linea);
+  border-radius:var(--radio);
+  color:var(--texto);
+  font-family:var(--mono);
+  font-size:12px;
+  padding:9px 11px;
+}
+input[type="text"]:focus{border-color:var(--arco-hondo)}
+
+.lanzar{
+  width:100%;
+  margin-top:20px;
+  padding:14px;
+  background:linear-gradient(180deg,#0e63c9,#0a3f8f);
+  border:1px solid #2b8fff;
+  border-radius:var(--radio);
+  color:#eaf6ff;
+  font-family:var(--display);
+  font-weight:700;
+  font-size:14px;
+  letter-spacing:.2em;
+  text-transform:uppercase;
+  cursor:pointer;
+  box-shadow:0 0 22px rgba(10,132,255,.3);
+  transition:box-shadow .2s, filter .2s;
+}
+.lanzar:hover:not(:disabled){box-shadow:0 0 34px rgba(77,225,255,.45)}
+.lanzar:disabled{opacity:.45;cursor:not-allowed;box-shadow:none}
+
+/* ============================================================ reactor */
+.reactor{
+  display:grid;
+  place-items:center;
+  padding:20px 0 6px;
+}
+.reactor svg{width:172px;height:172px;transform:rotate(-90deg)}
+.pista{stroke:#10203a;fill:none;stroke-width:7}
+.segmento{
+  fill:none;
+  stroke:#14263f;
+  stroke-width:7;
+  transition:stroke .3s;
+}
+.segmento.hecho{stroke:var(--arco);filter:drop-shadow(0 0 5px rgba(77,225,255,.75))}
+.segmento.curso{stroke:var(--oro);filter:drop-shadow(0 0 6px rgba(255,176,32,.8))}
+.segmento.roto{stroke:#ff4d5e}
+
+.nucleo{
+  position:absolute;
+  text-align:center;
+  pointer-events:none;
+}
+.nucleo .cifra{
+  font-family:var(--display);
+  font-weight:700;
+  font-size:32px;
+  color:var(--arco);
+  line-height:1;
+  display:block;
+}
+.nucleo .glosa{
+  font-family:var(--mono);
+  font-size:10px;
+  letter-spacing:.14em;
+  text-transform:uppercase;
+  color:var(--tenue);
+}
+.reactor-envoltura{position:relative;display:grid;place-items:center}
+
+@media (prefers-reduced-motion:reduce){
+  *{animation:none!important;transition:none!important}
+}
+
+/* ============================================================ salida */
+audio{width:100%;margin-top:14px;filter:invert(.92) hue-rotate(180deg)}
+
+.descargar{
+  display:block;
+  margin-top:12px;
+  padding:12px;
+  text-align:center;
+  border:1px solid var(--arco);
+  border-radius:var(--radio);
+  color:var(--arco);
+  font-family:var(--display);
+  font-weight:600;
+  font-size:13px;
+  letter-spacing:.16em;
+  text-transform:uppercase;
+  text-decoration:none;
+}
+.descargar:hover{background:rgba(77,225,255,.1)}
+
+.aviso{
+  margin-top:14px;
+  padding:11px 13px;
+  border-left:2px solid #ff4d5e;
+  background:rgba(255,77,94,.08);
+  font-family:var(--mono);
+  font-size:11.5px;
+  line-height:1.6;
+  color:#ffb4bc;
+}
+.aviso.ok{border-color:var(--arco);background:rgba(77,225,255,.07);color:var(--arco)}
+
+.oculto{display:none}
+
+footer{
+  margin-top:34px;
+  padding-top:14px;
+  border-top:1px solid var(--linea);
+  font-family:var(--mono);
+  font-size:10.5px;
+  letter-spacing:.08em;
+  color:#3d5169;
+}
+</style>
+</head>
+<body>
+<div class="marco">
+
+  <header>
+    <h1 class="marca">Reac<b>tor</b></h1>
+    <p class="lema">Guion → MP3 · voces neuronales en español</p>
+  </header>
+
+  <div class="tablero">
+
+    <!-- ------------------------------------------------ guion -->
+    <section class="modulo">
+      <p class="rotulo"><span>Guion</span><em id="bloquesPrevios">0 bloques</em></p>
+      <textarea id="guion" spellcheck="false"
+        placeholder="Pega acá el guion que te generó Claude.&#10;&#10;Escribí en texto corrido, sin viñetas ni números de slide — se leen en voz alta y suenan mal."></textarea>
+      <div class="telemetria">
+        <span>caracteres <strong id="numCaracteres">0</strong></span>
+        <span>palabras <strong id="numPalabras">0</strong></span>
+        <span>duración aprox. <strong id="duracion">0 min</strong></span>
+      </div>
+    </section>
+
+    <!-- ------------------------------------------------ consola -->
+    <section class="modulo">
+      <p class="rotulo"><span>Consola</span></p>
+
+      <div class="voces" id="voces"></div>
+
+      <label class="campo">
+        <span>Velocidad de la voz · queda grabada</span>
+        <div class="ritmo" id="ritmo"></div>
+      </label>
+
+      <label class="campo">
+        <span>Nombre del archivo</span>
+        <input type="text" id="nombre" value="clase" autocomplete="off">
+      </label>
+
+      <button class="lanzar" id="lanzar">Generar audio</button>
+
+      <div class="reactor oculto" id="reactor">
+        <div class="reactor-envoltura">
+          <svg viewBox="0 0 100 100" aria-hidden="true">
+            <circle class="pista" cx="50" cy="50" r="42"></circle>
+            <g id="segmentos"></g>
+          </svg>
+          <div class="nucleo">
+            <span class="cifra" id="porcentaje">0%</span>
+            <span class="glosa" id="etapa">en espera</span>
+          </div>
+        </div>
+      </div>
+
+      <div id="salida"></div>
+      <div id="mensaje"></div>
+    </section>
+
+  </div>
+
+  <footer>Cada segmento del anillo es un bloque de texto enviado a sintetizar.</footer>
+</div>
+
+<script>
+// ================================================================ config
+// Cambia esta línea si mueves el backend a otro lado.
+const API = "https://lector-tts.TU-SUBDOMINIO.workers.dev/tts";
+
+const MAX_BLOQUE = 2500;      // caracteres por petición
+const CHARS_POR_SEG = 14.5;   // ritmo de lectura en español, para el estimado
+
+const CATALOGO = [
+  { pais:"España",    F:{ n:"Elvira", id:"es-ES-ElviraNeural" }, M:{ n:"Álvaro", id:"es-ES-AlvaroNeural" } },
+  { pais:"México",    F:{ n:"Dalia",  id:"es-MX-DaliaNeural"  }, M:{ n:"Jorge",  id:"es-MX-JorgeNeural"  } },
+  { pais:"Argentina", F:{ n:"Elena",  id:"es-AR-ElenaNeural"  }, M:{ n:"Tomás",  id:"es-AR-TomasNeural"  } },
+];
+
+const ESCUCHAS = [1, 1.25, 1.5, 1.75, 2];
+
+const RITMOS = [
+  { etiqueta:"lento",  valor:"-15%" },
+  { etiqueta:"normal", valor:"+0%"  },
+  { etiqueta:"ágil",   valor:"+15%" },
+  { etiqueta:"rápido", valor:"+30%" },
+];
+
+const estado = { pais:1, genero:"F", rate:"+0%", escucha:1, url:null };
+
+const $ = (id) => document.getElementById(id);
+
+// ================================================================ partir
+function partir(texto) {
+  const limpio = texto.replace(/\r/g, "").replace(/[ \t]+/g, " ").trim();
+  if (!limpio) return [];
+
+  // Cortamos en fin de oración o salto de párrafo para que las pausas
+  // caigan donde ya hay pausa natural.
+  const piezas = limpio.split(/(?<=[.!?…:])\s+|\n{2,}/);
+  const bloques = [];
+  let actual = "";
+
+  for (let pieza of piezas) {
+    pieza = pieza.trim();
+    if (!pieza) continue;
+
+    while (pieza.length > MAX_BLOQUE) {
+      let corte = pieza.lastIndexOf(",", MAX_BLOQUE);
+      if (corte < MAX_BLOQUE * 0.5) corte = pieza.lastIndexOf(" ", MAX_BLOQUE);
+      if (corte < 1) corte = MAX_BLOQUE;
+      bloques.push(pieza.slice(0, corte).trim());
+      pieza = pieza.slice(corte).trim();
+    }
+
+    if ((actual + " " + pieza).trim().length > MAX_BLOQUE) {
+      if (actual) bloques.push(actual.trim());
+      actual = pieza;
+    } else {
+      actual = (actual + " " + pieza).trim();
+    }
+  }
+  if (actual) bloques.push(actual.trim());
+  return bloques;
+}
+
+// ================================================================ interfaz
+function pintarVoces() {
+  $("voces").innerHTML = CATALOGO.map((v, i) => `
+    <div class="voz ${i === estado.pais ? "activa" : ""}" data-pais="${i}" tabindex="0" role="button">
+      <span>
+        <span class="voz-pais">${v.pais}</span>
+        <span class="voz-nombre">${v[estado.genero].n}</span>
+        <span class="voz-id">${v[estado.genero].id}</span>
+      </span>
+      <span class="genero">
+        <button type="button" data-g="F" data-pais="${i}" aria-pressed="${estado.genero === "F"}">F</button>
+        <button type="button" data-g="M" data-pais="${i}" aria-pressed="${estado.genero === "M"}">M</button>
+      </span>
+    </div>`).join("");
+
+  $("voces").querySelectorAll(".voz").forEach((el) => {
+    const elegir = () => { estado.pais = +el.dataset.pais; pintarVoces(); };
+    el.addEventListener("click", (e) => { if (!e.target.closest(".genero")) elegir(); });
+    el.addEventListener("keydown", (e) => {
+      if (e.key === "Enter" || e.key === " ") { e.preventDefault(); elegir(); }
+    });
+  });
+
+  $("voces").querySelectorAll(".genero button").forEach((b) => {
+    b.addEventListener("click", () => {
+      estado.genero = b.dataset.g;
+      estado.pais = +b.dataset.pais;
+      pintarVoces();
+    });
+  });
+}
+
+function pintarRitmos() {
+  $("ritmo").innerHTML = RITMOS.map((r) => `
+    <button type="button" data-v="${r.valor}" aria-pressed="${r.valor === estado.rate}">${r.etiqueta}</button>
+  `).join("");
+  $("ritmo").querySelectorAll("button").forEach((b) => {
+    b.addEventListener("click", () => { estado.rate = b.dataset.v; pintarRitmos(); });
+  });
+}
+
+function pintarEscucha() {
+  const caja = $("escucha");
+  if (!caja) return;
+
+  caja.innerHTML = ESCUCHAS.map((v) => `
+    <button type="button" data-v="${v}" aria-pressed="${v === estado.escucha}">${v}×</button>
+  `).join("");
+
+  caja.querySelectorAll("button").forEach((b) => {
+    b.addEventListener("click", () => {
+      estado.escucha = parseFloat(b.dataset.v);
+      aplicarEscucha();
+      pintarEscucha();
+    });
+  });
+
+  aplicarEscucha();
+}
+
+function aplicarEscucha() {
+  const audio = $("reproductor");
+  if (!audio) return;
+  // preservesPitch evita el efecto ardilla al acelerar.
+  audio.preservesPitch = true;
+  audio.mozPreservesPitch = true;
+  audio.webkitPreservesPitch = true;
+  audio.playbackRate = estado.escucha;
+}
+
+function medir() {
+  const t = $("guion").value;
+  const palabras = t.trim() ? t.trim().split(/\s+/).length : 0;
+  const bloques = partir(t).length;
+  const min = Math.round(t.length / CHARS_POR_SEG / 60);
+
+  $("numCaracteres").textContent = t.length.toLocaleString("es-PE");
+  $("numPalabras").textContent = palabras.toLocaleString("es-PE");
+  $("duracion").textContent = min < 1 ? "menos de 1 min" : min + " min";
+  $("bloquesPrevios").textContent = bloques + (bloques === 1 ? " bloque" : " bloques");
+
+  try { localStorage.setItem("reactor:guion", t); } catch {}
+}
+
+function armarAnillo(n) {
+  const C = 2 * Math.PI * 42;
+  const hueco = n > 1 ? Math.min(2.4, C / n * 0.28) : 0;
+  const paso = C / n;
+
+  $("segmentos").innerHTML = Array.from({ length: n }, (_, i) => `
+    <circle class="segmento" data-i="${i}" cx="50" cy="50" r="42"
+      stroke-dasharray="${(paso - hueco).toFixed(2)} ${(C - paso + hueco).toFixed(2)}"
+      stroke-dashoffset="${(-paso * i).toFixed(2)}"></circle>`).join("");
+}
+
+function marcar(i, clase) {
+  const s = $("segmentos").querySelector(`[data-i="${i}"]`);
+  if (s) s.className.baseVal = "segmento " + clase;
+}
+
+function avisar(texto, ok = false) {
+  $("mensaje").innerHTML = texto
+    ? `<div class="aviso ${ok ? "ok" : ""}">${texto}</div>`
+    : "";
+}
+
+// ================================================================ generar
+async function sintetizarBloque(texto, voz) {
+  const r = await fetch(API, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ text: texto, voice: voz, rate: estado.rate }),
+  });
+
+  if (!r.ok) {
+    let detalle = `HTTP ${r.status}`;
+    try { detalle = (await r.json()).error || detalle; } catch {}
+    throw new Error(detalle);
+  }
+  return r.blob();
+}
+
+async function generar() {
+  const texto = $("guion").value.trim();
+  if (!texto) { avisar("Pegá un guion antes de generar."); return; }
+
+  const bloques = partir(texto);
+  const voz = CATALOGO[estado.pais][estado.genero].id;
+
+  $("lanzar").disabled = true;
+  $("lanzar").textContent = "Generando…";
+  $("salida").innerHTML = "";
+  avisar("");
+  $("reactor").classList.remove("oculto");
+  armarAnillo(bloques.length);
+
+  if (estado.url) { URL.revokeObjectURL(estado.url); estado.url = null; }
+
+  const partes = [];
+
+  for (let i = 0; i < bloques.length; i++) {
+    marcar(i, "curso");
+    $("etapa").textContent = `bloque ${i + 1} de ${bloques.length}`;
+    $("porcentaje").textContent = Math.round((i / bloques.length) * 100) + "%";
+
+    try {
+      partes.push(await sintetizarBloque(bloques[i], voz));
+      marcar(i, "hecho");
+    } catch (e) {
+      marcar(i, "roto");
+      $("etapa").textContent = "detenido";
+      avisar(
+        `Falló el bloque ${i + 1}: ${e.message}<br><br>` +
+        (partes.length
+          ? `Se alcanzaron a generar ${partes.length} bloques. Volvé a intentar; si sigue fallando, revisá el backend.`
+          : `Revisá que la URL del backend en la constante API de index.html esté bien y que el Worker esté desplegado.`)
+      );
+      $("lanzar").disabled = false;
+      $("lanzar").textContent = "Generar audio";
+      if (!partes.length) return;
+      break;
+    }
+  }
+
+  // Todos los bloques salen en el mismo formato (24 kHz, 48 kbps, mono),
+  // así que se pegan a nivel de bytes sin re-codificar.
+  const mp3 = new Blob(partes, { type: "audio/mpeg" });
+  estado.url = URL.createObjectURL(mp3);
+
+  const archivo = ($("nombre").value.trim() || "clase").replace(/[^\w\-.]/g, "-") + ".mp3";
+  const peso = (mp3.size / 1048576).toFixed(1);
+
+  $("porcentaje").textContent = "100%";
+  $("etapa").textContent = "listo";
+  $("salida").innerHTML = `
+    <audio id="reproductor" controls src="${estado.url}"></audio>
+    <div class="campo">
+      <span>Velocidad de escucha · solo acá</span>
+      <div class="ritmo" id="escucha"></div>
+    </div>
+    <a class="descargar" href="${estado.url}" download="${archivo}">Descargar ${archivo} · ${peso} MB</a>`;
+
+  pintarEscucha();
+
+  $("lanzar").disabled = false;
+  $("lanzar").textContent = "Generar audio";
+}
+
+// ================================================================ arranque
+pintarVoces();
+pintarRitmos();
+try {
+  const guardado = localStorage.getItem("reactor:guion");
+  if (guardado) $("guion").value = guardado;
+} catch {}
+medir();
+
+$("guion").addEventListener("input", medir);
+$("lanzar").addEventListener("click", generar);
+</script>
+</body>
+</html>
