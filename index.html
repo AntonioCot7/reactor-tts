@@ -361,6 +361,21 @@ audio{width:100%;margin-top:14px;filter:invert(.92) hue-rotate(180deg)}
 
 .oculto{display:none}
 
+/* ============================================================ escucha y movil */
+#escucha{flex-wrap:wrap}
+#escucha button{flex:1 0 22%}
+
+button{touch-action:manipulation;-webkit-tap-highlight-color:transparent}
+
+@media (max-width:900px){
+  /* iOS hace zoom al enfocar un campo con letra menor a 16px */
+  textarea,input[type="text"]{font-size:16px}
+  .genero button{padding:12px 15px;font-size:11px}
+  .ritmo button{padding:13px 0;font-size:12px}
+  .marco{padding:20px 16px 56px}
+}
+
+
 footer{
   margin-top:34px;
   padding-top:14px;
@@ -448,7 +463,7 @@ const CATALOGO = [
   { pais:"Argentina", F:{ n:"Elena",  id:"es-AR-ElenaNeural"  }, M:{ n:"Tomás",  id:"es-AR-TomasNeural"  } },
 ];
 
-const ESCUCHAS = [1, 1.25, 1.5, 1.75, 2];
+const ESCUCHAS = [0.5, 0.75, 1, 1.25, 1.5, 1.75, 2];
 
 const RITMOS = [
   { etiqueta:"lento",  valor:"-15%" },
@@ -460,6 +475,18 @@ const RITMOS = [
 const estado = { pais:1, genero:"F", rate:"+0%", escucha:1, url:null };
 
 const $ = (id) => document.getElementById(id);
+
+// Mantiene la pantalla encendida mientras se genera (si el navegador lo permite).
+let bloqueoPantalla = null;
+async function pantallaActiva() {
+  try {
+    if ("wakeLock" in navigator) bloqueoPantalla = await navigator.wakeLock.request("screen");
+  } catch {}
+}
+function pantallaLibre() {
+  try { if (bloqueoPantalla) bloqueoPantalla.release(); } catch {}
+  bloqueoPantalla = null;
+}
 
 // ================================================================ partir
 function partir(texto) {
@@ -626,6 +653,7 @@ async function generar() {
 
   $("lanzar").disabled = true;
   $("lanzar").textContent = "Generando…";
+  await pantallaActiva();
   $("salida").innerHTML = "";
   avisar("");
   $("reactor").classList.remove("oculto");
@@ -654,6 +682,7 @@ async function generar() {
       );
       $("lanzar").disabled = false;
       $("lanzar").textContent = "Generar audio";
+      pantallaLibre();
       if (!partes.length) return;
       break;
     }
@@ -681,6 +710,7 @@ async function generar() {
 
   $("lanzar").disabled = false;
   $("lanzar").textContent = "Generar audio";
+  pantallaLibre();
 }
 
 // ================================================================ arranque
