@@ -437,7 +437,7 @@ footer{
 <script>
 // ================================================================ config
 // Cambia esta línea si mueves el backend a otro lado.
-const API = "https://lector-tts.TU-SUBDOMINIO.workers.dev/tts";
+const API = "https://reactor-tts.onrender.com/tts";
 
 const MAX_BLOQUE = 2500;      // caracteres por petición
 const CHARS_POR_SEG = 14.5;   // ritmo de lectura en español, para el estimado
@@ -650,7 +650,7 @@ async function generar() {
         `Falló el bloque ${i + 1}: ${e.message}<br><br>` +
         (partes.length
           ? `Se alcanzaron a generar ${partes.length} bloques. Volvé a intentar; si sigue fallando, revisá el backend.`
-          : `Revisá que la URL del backend en la constante API de index.html esté bien y que el Worker esté desplegado.`)
+          : `Revisá que la URL del backend en la constante API de index.html esté bien y que el servidor esté activo (si estaba dormido, espera un minuto y reintenta).`)
       );
       $("lanzar").disabled = false;
       $("lanzar").textContent = "Generar audio";
@@ -691,6 +691,9 @@ try {
   if (guardado) $("guion").value = guardado;
 } catch {}
 medir();
+
+// Despierta el servidor (Render gratis se duerme) mientras pegas el guion.
+fetch(API.replace(/\/tts$/, "/salud")).catch(() => {});
 
 $("guion").addEventListener("input", medir);
 $("lanzar").addEventListener("click", generar);
