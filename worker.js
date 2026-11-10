@@ -12,11 +12,11 @@
 // ---------------------------------------------------------------- constantes
 
 const TRUSTED_CLIENT_TOKEN = "6A5AA1D4EAFF4E9FB37E23D68491D6F4";
-const CHROMIUM_VERSION = "143.0.3650.0";
+const CHROMIUM_VERSION = "143.0.3650.75";
 const WIN_EPOCH = 11644473600n; // segundos entre 1601-01-01 y 1970-01-01
 
 const BASE_WSS =
-  "wss://speech.platform.bing.com/consumer/speech/synthesize/readaloud/edge/v1";
+  "https://speech.platform.bing.com/consumer/speech/synthesize/readaloud/edge/v1";
 
 const USER_AGENT =
   "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 " +
@@ -107,7 +107,7 @@ async function sintetizar(texto, voz, rate) {
   const url =
     `${BASE_WSS}?TrustedClientToken=${TRUSTED_CLIENT_TOKEN}` +
     `&Sec-MS-GEC=${gec}` +
-    `&Sec-MS-GEC-Version=1-${CHROMIUM_VERSION}` +
+    `&Sec-MS-GEC-Version=2-${CHROMIUM_VERSION}` +
     `&ConnectionId=${connectionId}`;
 
   const respuesta = await fetch(url, {

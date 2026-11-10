@@ -7,10 +7,9 @@ Convierte guiones de estudio en MP3 con voces neuronales en español (España, M
 
 ## Puesta en marcha
 
-1. Desplegar el Worker:
+1. Desplegar el Worker (desde esta carpeta):
    ```
-   npm create cloudflare@latest lector-tts -- --type=hello-world
-   # reemplazar src/index.js con worker.js
+   npx wrangler login
    npx wrangler deploy
    ```
 2. Poner la URL del Worker en la constante `API` de `index.html` (termina en `/tts`).
